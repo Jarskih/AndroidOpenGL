@@ -12,8 +12,8 @@ public class Player extends GLEntity {
         super();
         _x = x;
         _y = y;
-        _width = 8f; //TODO: gameplay values!
-        _height = 12f;
+        _width = 3f; //TODO: gameplay values!
+        _height = 4f;
         float[] vertices = { // in counterclockwise order:
                 0.0f,  0.5f, 0.0f, 	// top
                 -0.5f, -0.5f, 0.0f,	// bottom left
@@ -26,8 +26,8 @@ public class Player extends GLEntity {
     }
 
     static final float ROTATION_VELOCITY = 360f; //TODO: game play values!
-    static final float THRUST = 7f;
-    static final float DRAG = 0.95f;
+    static final float THRUST = 2f;
+    static final float DRAG = 0.99f;
 
     @Override
     public void update(double dt){
@@ -47,7 +47,7 @@ public class Player extends GLEntity {
                 _bulletCooldown = TIME_BETWEEN_SHOTS;
             }
         }else{
-            setColors(1.0f, 1, 1,1);
+            setColors(Colors.yellow);
         }
 
         super.update(dt);

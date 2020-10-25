@@ -66,6 +66,7 @@ public class GLEntity {
         return !_isAlive;
     }
     public void onCollision(final GLEntity that) {
+        _game.onGameEvent(Game.GameEvent.Explosion);
         _isAlive = false;
     }
 

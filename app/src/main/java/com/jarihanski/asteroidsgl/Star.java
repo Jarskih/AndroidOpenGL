@@ -19,5 +19,6 @@ public class Star extends GLEntity {
             m = new Mesh(vertices, GLES20.GL_POINTS);
         }
         _mesh = m; //all Stars use the exact same Mesh instance.
+        setColors(1.0f, 1.0f,1.0f, 1.0f);
     }
 }

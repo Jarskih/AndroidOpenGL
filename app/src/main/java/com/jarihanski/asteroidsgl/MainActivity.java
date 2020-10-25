@@ -24,6 +24,25 @@ public class MainActivity extends AppCompatActivity {
         _game.setControls(controls);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        _game.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        _game.onPause();
+        isFinishing();
+    }
+
+    @Override
+    protected void onDestroy() {
+        _game.onDestroy();
+        super.onDestroy();
+    }
+
     @SuppressWarnings("deprecation")
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
