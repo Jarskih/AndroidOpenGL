@@ -1,6 +1,7 @@
 package com.jarihanski.asteroidsgl;
 
 import android.graphics.Color;
+import android.opengl.Matrix;
 
 public class Analytics {
 
@@ -8,6 +9,7 @@ public class Analytics {
     private int _frames = 0;
     private Text _fpsCounter = null;
     private double _msPerFrame;
+    private float[] _viewportMatrix = new float[4*4];
 
     Analytics() {
     }
@@ -22,9 +24,10 @@ public class Analytics {
         }
     }
 
-    void render(final float[] viewportMatrix) {
+    void render() {
+        final int OFFSET = 1;
         _fpsCounter = new Text(String.valueOf((int)_msPerFrame) + " mspf", 5, 5);
         _fpsCounter.setColors(Colors.yellow);
-        _fpsCounter.render(viewportMatrix);
+        _fpsCounter.render(_viewportMatrix);
     }
 }

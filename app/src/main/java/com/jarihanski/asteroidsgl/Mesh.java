@@ -30,6 +30,9 @@ public class Mesh {
     public Point3D _min = new Point3D();
     public Point3D _max = new Point3D();
 
+    PointF[] _hull = null;
+    private int _pointIndex = 0;
+
     public Mesh(final float[] geometry){
         init(geometry, GLES20.GL_TRIANGLES);
     }
@@ -39,6 +42,10 @@ public class Mesh {
     private void init(final float[] geometry, final int drawMode){
         setVertices(geometry);
         setDrawmode(drawMode);
+        _hull = new PointF[_vertexCount];
+        for(int i = 0; i < _hull.length; i++) {
+            _hull[i] = new PointF();
+        }
     }
 
     public void setDrawmode(int drawMode){
@@ -210,8 +217,20 @@ public class Mesh {
             final float rotatedX = (float) (x * cosTheta - y * sinTheta) + offsetX;
             final float rotatedY = (float) (y * cosTheta + x * sinTheta) + offsetY;
             //final float z = verts[i + Z];
-            out[index++] = new PointF(rotatedX, rotatedY);  //TODO: DANGER! We're creating new objects, make a pool instead!
+            out[index++] = getNewPoint(rotatedX, rotatedY);
         }
         return out;
+    }
+
+    private PointF getNewPoint(float rotatedX, float rotatedY) {
+        if(_pointIndex >= _hull.length) {
+            _pointIndex = 0;
+        }
+
+        PointF p = _hull[_pointIndex];
+        _pointIndex += 1;
+        p.x = rotatedX;
+        p.y = rotatedY;
+        return p;
     }
 }

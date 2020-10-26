@@ -5,6 +5,7 @@ import android.opengl.Matrix;
 
 
 public class Camera {
+    public float[] viewportMatrix = new float[4*4]; //In essence, it is our our Camera
     static float METERS_TO_SHOW_X = 160f;
     static float METERS_TO_SHOW_Y = 90f;
     private float _x;

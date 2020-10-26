@@ -15,24 +15,25 @@ import javax.microedition.khronos.opengles.GL10;
 public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
     private static final String TAG = "Game";
     private Player _player;
-    private Thread _gameThread = null;
-    private boolean _isRunning = false;
     private MusicPlayer _musicPlayer = null;
     private SoundPlayer _soundPlayer = null;
     private Analytics _analytics = null;
     private Camera _camera = null;
+    private ParticleSystem _particleSystem = null;
 
-    static float WORLD_WIDTH = 160f; //all dimensions are in meters
-    static float WORLD_HEIGHT = 90f;
-
-    // Create the projection Matrix. This is used to project the scene onto a 2D viewport.
-    private float[] _viewportMatrix = new float[4*4]; //In essence, it is our our Camera
+    static float WORLD_WIDTH = 480; //all dimensions are in meters
+    static float WORLD_HEIGHT = 270;
 
     private static int STAR_COUNT = 100;
     private ArrayList<Star> _stars= new ArrayList();
 
     private static int ASTEROID_COUNT = 20;
+    private static int ASTEROID_TYPES = 3;
     private ArrayList<Asteroid> _asteroids = new ArrayList();
+    private ArrayList<Particle> _particlesToAdd;
+    private ArrayList<Particle> _particles;
+    private int PARTICLES_PER_EXPLOSION = 5;
+    private final int MAX_PARTICLES = 20;
 
     public enum GameEvent {
         Explosion,
@@ -62,6 +63,8 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
 
     private void Init() {
         _player = new Player(WORLD_WIDTH/2f, 10);
+        _particlesToAdd = new ArrayList<Particle>();
+        _particles = new ArrayList<Particle>();
 
         Random r = new Random();
         for(int i = 0; i < STAR_COUNT; i++){
@@ -69,7 +72,7 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
         }
 
         for(int i = 0; i < ASTEROID_COUNT; i++) {
-            _asteroids.add(new Asteroid(r.nextInt((int)WORLD_WIDTH), r.nextInt((int)WORLD_HEIGHT), r.nextInt(10)));
+            _asteroids.add(new Asteroid(r.nextInt((int)WORLD_WIDTH), r.nextInt((int)WORLD_HEIGHT), r.nextInt(ASTEROID_TYPES)));
         }
 
         for(int i = 0; i < BULLET_COUNT; i++){
@@ -80,8 +83,9 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
         _musicPlayer = new MusicPlayer(getContext());
         _musicPlayer.playMusic();
 
+        _particleSystem = new ParticleSystem(MAX_PARTICLES);
         _analytics = new Analytics();
-        _camera = new Camera(WORLD_WIDTH - WORLD_WIDTH/10);
+        _camera = new Camera(WORLD_WIDTH/3);
 
         GLEntity._game = this;
         setEGLContextClientVersion(2); //select OpenGL ES 2.0
@@ -107,6 +111,10 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
         currentTime = newTime;
         accumulator += frameTime;
         while(accumulator >= dt){
+            for(final Particle p : _particles) {
+                p.update(dt);
+            }
+
             for(final Asteroid a : _asteroids){
                 a.update(dt);
             }
@@ -121,33 +129,38 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
 
             collisionDetection();
             removeDeadEntities();
+            addNewEntities();
 
             accumulator -= dt;
         }
-
-
     }
 
     private void render(){
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT); //clear buffer to background color
         //setup a projection matrix by passing in the range of the game world that will be mapped by OpenGL to the screen.
 
-        _camera.lookAt(_player._x, _player._y,_viewportMatrix);
+        _camera.lookAt(_player._x, _player._y, _camera.viewportMatrix);
 
         for(final Asteroid a : _asteroids){
-            a.render(_viewportMatrix);
+            a.render(_camera.viewportMatrix);
         }
+
+        for(final Particle p : _particles) {
+            p.render(_camera.viewportMatrix);
+        }
+
         for(final Star s : _stars){
-            s.render(_viewportMatrix);
+            s.render(_camera.viewportMatrix);
         }
-        _player.render(_viewportMatrix);
+
+        _player.render(_camera.viewportMatrix);
 
         for(final Bullet b : _bullets){
             if(b.isDead()){ continue; } //skip
-            b.render(_viewportMatrix);
+            b.render(_camera.viewportMatrix);
         }
 
-        _analytics.render(_viewportMatrix);
+        _analytics.render();
     }
 
     public boolean maybeFireBullet(final GLEntity source){
@@ -159,6 +172,12 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
             }
         }
         return false;
+    }
+
+    public void spawnParticles(float x, float y) {
+        for(int i = 0; i < PARTICLES_PER_EXPLOSION; i++) {
+            _particlesToAdd.add(_particleSystem.getParticle(x, y));
+        }
     }
 
     private void collisionDetection(){
@@ -181,15 +200,32 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
         }
     }
 
-    public void removeDeadEntities(){
-        Asteroid temp;
-        final int count = _asteroids.size();
-        for(int i = count-1; i >= 0; i--){
-            temp = _asteroids.get(i);
-            if(temp.isDead()){
-                _asteroids.remove(i);
+    public void removeDeadEntities() {
+        {
+            Asteroid temp;
+            final int count = _asteroids.size();
+            for (int i = count - 1; i >= 0; i--) {
+                temp = _asteroids.get(i);
+                if (temp.isDead()) {
+                    _asteroids.remove(i);
+                }
             }
         }
+        {
+            Particle temp;
+            final int count = _particles.size();
+            for (int i = count - 1; i >= 0; i--) {
+                temp = _particles.get(i);
+                if (temp.isDead()) {
+                    _particles.remove(i);
+                }
+            }
+        }
+    }
+
+    private void addNewEntities() {
+        _particles.addAll(_particlesToAdd);
+        _particlesToAdd.clear();
     }
 
     public void setControls(final InputManager input){
@@ -212,21 +248,10 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
         if(_musicPlayer != null) {
             _musicPlayer.destroy();
         }
-
-        _isRunning = false;
-        while(true) {
-            try {
-                _gameThread.join();
-                return;
-            } catch (InterruptedException e) {
-                Log.d(TAG, Log.getStackTraceString(e.getCause()));
-            }
-        }
     }
 
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
-        _gameThread = null;
         _inputs = null;
         if(_musicPlayer != null) {
             _musicPlayer.destroy();
@@ -248,7 +273,7 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
         GLES20.glClearColor(Colors.blue[0], Colors.blue[1], Colors.blue[2], Colors.blue[3]);
 
         // build shader program
-        GLManager.buildProgram();
+        GLManager.buildProgram(getContext());
     }
 
     @Override
@@ -258,7 +283,7 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(final GL10 unused) {
-         update(); //TODO: move updates away from the render thread...
+        update(); //TODO: move updates away from the render thread...
         render();
     }
 }

@@ -1,8 +1,12 @@
 package com.jarihanski.asteroidsgl;
 
+import android.content.Context;
 import android.opengl.GLES20;
 import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
 
 public class GLManager {
@@ -15,23 +19,8 @@ public class GLManager {
     private static int positionAttributeHandle; //handle to the vertex position setting
 
     private static int MVPMatrixHandle; //handle to the model-view-projection matrix
-
-    //shader source code (could be loaded from textfile!)
-    private final static String vertexShaderCode =
-            "uniform mat4 modelViewProjection;\n" + // A constant representing the combined model/view/projection matrix.
-                    "attribute vec4 position;\n" +      // Per-vertex position information that we will pass in.
-                    "void main() {\n" +                 // The entry point for our vertex shader.
-                    "    gl_Position = modelViewProjection\n" +    // gl_Position is a special variable used to store the final position.
-                    "        * position;\n" +// Multiply the vertex by the matrix to get the final point in normalized screen coordinates.
-                    "    gl_PointSize = 8.0;\n" + //pixel width of points
-                    "}\n";
-
-    private final static String fragmentShaderCode =
-            "precision mediump float;\n" + //we don't need high precision floats for fragments
-                    "uniform vec4 color;\n" + // a constant color to apply to all pixels
-                    "void main() {\n" + // The entry point for our fragment shader.
-                    "  gl_FragColor = color;\n" + // Pass the color directly through the pipeline.
-                    "}\n";
+    private static String vertexShaderCode;
+    private static String fragmentShaderCode;
 
 
     public static void checkGLError(final String func){
@@ -41,7 +30,10 @@ public class GLManager {
         }
     }
 
-    public static void buildProgram(){
+    public static void buildProgram(Context context){
+        if(!loadShaders(context)) {
+            Log.e("Failed load shaders", TAG);
+        };
         final int vertex = compileShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
         final int fragment = compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
         glProgramHandle = linkShaders(vertex, fragment);
@@ -57,6 +49,30 @@ public class GLManager {
         GLES20.glUseProgram(glProgramHandle);
         GLES20.glLineWidth(5f); //draw lines 5px wide
         checkGLError("buildProgram");
+    }
+
+    private static boolean loadShaders(Context context) {
+        try {
+            char[] buffer = new char[256];
+            BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.vertex)));
+            int bytes = reader.read(buffer);
+            vertexShaderCode = new String(buffer, 0, bytes);
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        try {
+            char[] buffer = new char[256];
+            BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.fragment)));
+            int bytes = reader.read(buffer);
+            fragmentShaderCode = new String(buffer, 0, bytes);
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     private static void setModelViewProjection(final float[] modelViewMatrix) {
