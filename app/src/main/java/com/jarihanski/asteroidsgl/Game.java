@@ -5,7 +5,6 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -20,34 +19,24 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
     private Analytics _analytics = null;
     private Camera _camera = null;
     private ParticleSystem _particleSystem = null;
+    private Config _config = null;
+    private Waves _waves = null;
+    private Hud _hud = null;
 
-    static float WORLD_WIDTH = 480; //all dimensions are in meters
-    static float WORLD_HEIGHT = 270;
-
-    private static int STAR_COUNT = 100;
     private ArrayList<Star> _stars= new ArrayList();
 
-    private static int ASTEROID_COUNT = 20;
-    private static int ASTEROID_TYPES = 3;
     private ArrayList<Asteroid> _asteroids = new ArrayList();
     private ArrayList<Particle> _particlesToAdd;
     private ArrayList<Particle> _particles;
-    private int PARTICLES_PER_EXPLOSION = 5;
-    private final int MAX_PARTICLES = 20;
+
+    Bullet[] _bullets = new Bullet[Config.BULLET_COUNT];
+    private boolean _gameOver;
 
     public enum GameEvent {
         Explosion,
         Shoot,
         PlayerDied
     }
-
-    public static long SECOND_IN_NANOSECONDS = 1000000000;
-    public static long MILLISECOND_IN_NANOSECONDS = 1000000;
-    public static float NANOSECONDS_TO_MILLISECONDS = 1.0f / MILLISECOND_IN_NANOSECONDS;
-    public static float NANOSECONDS_TO_SECONDS = 1.0f / SECOND_IN_NANOSECONDS;
-
-    private static final int BULLET_COUNT = (int)(Bullet.TIME_TO_LIVE/Player.TIME_BETWEEN_SHOTS)+1;
-    Bullet[] _bullets = new Bullet[BULLET_COUNT];
 
     public InputManager _inputs = new InputManager(); //empty but valid default
 
@@ -62,20 +51,22 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
     }
 
     private void Init() {
-        _player = new Player(WORLD_WIDTH/2f, 10);
+        _gameOver = false;
+        _config = new Config(getContext());
+        _player = new Player(Config.WORLD_WIDTH/2f, Config.WORLD_HEIGHT/2f);
         _particlesToAdd = new ArrayList<Particle>();
         _particles = new ArrayList<Particle>();
+        _waves = new Waves();
+        _hud = new Hud();
 
         Random r = new Random();
-        for(int i = 0; i < STAR_COUNT; i++){
-            _stars.add(new Star(r.nextInt((int)WORLD_WIDTH), r.nextInt((int)WORLD_HEIGHT)));
+        for(int i = 0; i < Config.STAR_COUNT; i++){
+            _stars.add(new Star(r.nextInt((int) Config.WORLD_WIDTH), r.nextInt((int)Config.WORLD_HEIGHT)));
         }
 
-        for(int i = 0; i < ASTEROID_COUNT; i++) {
-            _asteroids.add(new Asteroid(r.nextInt((int)WORLD_WIDTH), r.nextInt((int)WORLD_HEIGHT), r.nextInt(ASTEROID_TYPES)));
-        }
+        _asteroids = _waves.start();
 
-        for(int i = 0; i < BULLET_COUNT; i++){
+        for(int i = 0; i < Config.BULLET_COUNT; i++){
             _bullets[i] = new Bullet();
         }
 
@@ -83,9 +74,9 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
         _musicPlayer = new MusicPlayer(getContext());
         _musicPlayer.playMusic();
 
-        _particleSystem = new ParticleSystem(MAX_PARTICLES);
+        _particleSystem = new ParticleSystem(Config.MAX_PARTICLES);
         _analytics = new Analytics();
-        _camera = new Camera(WORLD_WIDTH/3);
+        _camera = new Camera(Config.WORLD_WIDTH/2);
 
         GLEntity._game = this;
         setEGLContextClientVersion(2); //select OpenGL ES 2.0
@@ -104,9 +95,9 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
     //   https://gafferongames.com/post/fix_your_timestep/
     final double dt = 0.01;
     double accumulator = 0.0;
-    double currentTime = System.nanoTime()*NANOSECONDS_TO_SECONDS;
+    double currentTime = System.nanoTime()*Config.NANOSECONDS_TO_SECONDS;
     private void update(){
-        final double newTime = System.nanoTime()*NANOSECONDS_TO_SECONDS;
+        final double newTime = System.nanoTime()*Config.NANOSECONDS_TO_SECONDS;
         final double frameTime = newTime - currentTime;
         currentTime = newTime;
         accumulator += frameTime;
@@ -130,6 +121,9 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
             collisionDetection();
             removeDeadEntities();
             addNewEntities();
+
+            checkWaveDone();
+            checkGameOver();
 
             accumulator -= dt;
         }
@@ -160,7 +154,9 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
             b.render(_camera.viewportMatrix);
         }
 
-        _analytics.render();
+        _analytics.render(getContext(), _camera.viewportMatrix, _player);
+
+        _hud.render(_player, getContext(), _camera.viewportMatrix,_waves.getWave(),_asteroids.size());
     }
 
     public boolean maybeFireBullet(final GLEntity source){
@@ -175,7 +171,7 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
     }
 
     public void spawnParticles(float x, float y) {
-        for(int i = 0; i < PARTICLES_PER_EXPLOSION; i++) {
+        for(int i = 0; i < Config.PARTICLES_PER_EXPLOSION; i++) {
             _particlesToAdd.add(_particleSystem.getParticle(x, y));
         }
     }
@@ -230,6 +226,36 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
 
     public void setControls(final InputManager input){
         _inputs = input;
+    }
+
+    private void checkGameOver() {
+        if(_player._isAlive) {
+            return;
+        }
+
+        if(!_gameOver) {
+            _gameOver = true;
+            spawnParticles(_player._x, _player._y);
+            restart();
+        }
+    }
+
+    private void checkWaveDone() {
+        if(_asteroids.isEmpty()) {
+            _waves.nextWave();
+        }
+    }
+
+    private void restart() {
+        for (Asteroid a : _asteroids) {
+            a._isAlive = false;
+        }
+        _asteroids.clear();
+        _asteroids = _waves.start();
+
+        spawnParticles(_player._x, _player._y);
+        _gameOver = false;
+        _player.respawn();
     }
 
     /*All methods below this line are executing on the system UI thread!*/

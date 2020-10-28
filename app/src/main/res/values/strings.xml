@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">asteroidsgl</string>
+    <string name="score">Score </string>
+    <string name="wave">Wave </string>
+    <string name="asteroids_remaining">Asteroids </string>
+    <string name="mspf"> mspf</string>
 </resources>

@@ -3,26 +3,6 @@ package com.jarihanski.asteroidsgl;
 import android.opengl.GLES20;
 
 public class Asteroid extends GLEntity {
-    private static final float BIG_MIN_VEL = 4;
-    private static final float BIG_MAX_VEL = -4f;
-
-    private static final float MEDIUM_MIN_VEL = 6f;
-    private static final float MEDIUM_MAX_VEL = -6f;
-
-    private static final float SMALL_MIN_VEL = 8f;
-    private static final float SMALL_MAX_VEL = -8f;
-
-    // Sizes
-    private static final float BIG_SIZE = 12;
-    private static final float MEDIUM_SIZE = 8;
-    private static final float SMALL_SIZE = 4;
-
-    // Shapes
-    public static class Points {
-        private static final int BIG = 9;
-        private static final int MEDIUM = 7;
-        private static final int SMALL = 5;
-    }
 
     public static class AsteroidType {
         final static int BIG = 2;
@@ -46,24 +26,24 @@ public class Asteroid extends GLEntity {
     private void create(int size) {
         switch (size) {
             case AsteroidType.BIG: {
-                _points = Points.BIG;
-                _width = BIG_SIZE;
-                _velX = Utils.between(BIG_MIN_VEL, BIG_MAX_VEL);
-                _velY = Utils.between(BIG_MIN_VEL, BIG_MAX_VEL);
+                _points = Config.Points.BIG;
+                _width = Config.BIG_SIZE;
+                _velX = Utils.between(Config.BIG_MIN_VEL, Config.BIG_MAX_VEL);
+                _velY = Utils.between(Config.BIG_MIN_VEL, Config.BIG_MAX_VEL);
             }
             break;
             case AsteroidType.MEDIUM: {
-                _points = Points.MEDIUM;
-                _width = MEDIUM_SIZE;
-                _velX = Utils.between(MEDIUM_MIN_VEL, MEDIUM_MAX_VEL);
-                _velY = Utils.between(MEDIUM_MIN_VEL, MEDIUM_MAX_VEL);
+                _points = Config.Points.MEDIUM;
+                _width = Config.MEDIUM_SIZE;
+                _velX = Utils.between(Config.MEDIUM_MIN_VEL, Config.MEDIUM_MAX_VEL);
+                _velY = Utils.between(Config.MEDIUM_MIN_VEL, Config.MEDIUM_MAX_VEL);
             }
             break;
             case AsteroidType.SMALL: {
-                _points = Points.SMALL;
-                _width = SMALL_SIZE;
-                _velX = Utils.between(SMALL_MIN_VEL, SMALL_MAX_VEL);
-                _velY = Utils.between(SMALL_MIN_VEL, SMALL_MAX_VEL);
+                _points = Config.Points.SMALL;
+                _width = Config.SMALL_SIZE;
+                _velX = Utils.between(Config.SMALL_MIN_VEL, Config.SMALL_MAX_VEL);
+                _velY = Utils.between(Config.SMALL_MIN_VEL, Config.SMALL_MAX_VEL);
             }
             break;
             default: {

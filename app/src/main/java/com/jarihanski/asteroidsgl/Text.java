@@ -17,7 +17,7 @@ public class Text extends GLEntity {
         setString(s);
         _x = x;
         _y = y;
-        setScale(0.75f); //TODO: magic value
+        setScale(Config.TEXT_SCALE);
     }
 
     @Override

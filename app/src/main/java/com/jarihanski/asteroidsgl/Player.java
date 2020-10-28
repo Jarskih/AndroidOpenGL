@@ -12,8 +12,8 @@ public class Player extends GLEntity {
         super();
         _x = x;
         _y = y;
-        _width = 3f; //TODO: gameplay values!
-        _height = 4f;
+        _width = Config.PLAYER_WIDTH;
+        _height = Config.PLAYER_HEIGHT;
         float[] vertices = { // in counterclockwise order:
                 0.0f,  0.5f, 0.0f, 	// top
                 -0.5f, -0.5f, 0.0f,	// bottom left
@@ -54,6 +54,11 @@ public class Player extends GLEntity {
     }
 
     @Override
+    public void onCollision(GLEntity that) {
+        _isAlive = false;
+    }
+
+    @Override
     public void render(float[] viewportMatrix) {
         super.render(viewportMatrix);
     }
@@ -69,5 +74,11 @@ public class Player extends GLEntity {
             return true;
         }
         return CollisionDetection.polygonVsPoint(asteroidHull, _x, _y); //finally, check if we're inside the asteroid
+    }
+
+    public void respawn() {
+        _x = Config.WORLD_WIDTH/2f;
+        _y = Config.WORLD_HEIGHT/2f;
+        _isAlive = true;
     }
 }

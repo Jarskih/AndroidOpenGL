@@ -30,16 +30,16 @@ public class GLEntity {
         _x += _velX * dt;
         _y += _velY * dt;
 
-        if(left() > Game.WORLD_WIDTH){
+        if(left() > Config.WORLD_WIDTH){
             setRight(0);
         }else if(right() < 0){
-            setLeft(Game.WORLD_WIDTH);
+            setLeft(Config.WORLD_WIDTH);
         }
 
-        if(top() > Game.WORLD_HEIGHT){
+        if(top() > Config.WORLD_HEIGHT){
             setBottom(0);
         }else if(bottom() < 0){
-            setTop(Game.WORLD_HEIGHT);
+            setTop(Config.WORLD_HEIGHT);
         }
     }
 

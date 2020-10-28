@@ -1,25 +1,45 @@
 package com.jarihanski.asteroidsgl;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Waves {
     private int _currentWave;
-    private int MAX_WAVE = 10;
-    private int ASTEROIDS_AT_START = 5;
-
     private int _asteroids;
-    private int ASTEROID_INCREASE_PER_WAVE = 10;
+    ArrayList<Asteroid> _wave;
+    Random _r;
 
     Waves() {
-        _currentWave = 0;
-        _asteroids = ASTEROIDS_AT_START;
+        _r = new Random();
+        _wave = new ArrayList<Asteroid>();
     }
 
-    public ArrayList<Asteroid> Start() {
-
+    public ArrayList<Asteroid> start() {
+        clean();
+        _currentWave = 1;
+        _asteroids = Config.ASTEROIDS_AT_START;
+        return createAsteroids();
     }
 
-    public ArrayList<Asteroid> NextWave() {
+    public ArrayList<Asteroid> nextWave() {
+        clean();
+        _currentWave += 1;
+        _asteroids += Config.ASTEROID_INCREASE_PER_WAVE;
+        return createAsteroids();
+    }
 
+    private ArrayList<Asteroid> createAsteroids() {
+        for(int i = 0; i < _asteroids; i++) {
+            _wave.add(new Asteroid(_r.nextInt((int)Config.WORLD_WIDTH), _r.nextInt((int) Config.WORLD_HEIGHT), _r.nextInt(Config.ASTEROID_TYPES)));
+        }
+        return _wave;
+    }
+
+    public void clean() {
+        _wave.clear();
+    }
+
+    public int getWave() {
+        return _currentWave;
     }
 }
