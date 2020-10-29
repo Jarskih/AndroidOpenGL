@@ -11,12 +11,15 @@ import java.nio.FloatBuffer;
 
 public class GLManager {
     public final static String TAG = "GLManager";
+    public static Game _game;
     private static final int OFFSET = 0; //just to have a name for the parameter
 
     //handles to various GL objects:
     private static int glProgramHandle; //handle to the compiled shader program
     private static int colorUniformHandle; //handle to the color setting
     private static int positionAttributeHandle; //handle to the vertex position setting
+    private static int textureCoordHandle; // handle to texture coordinates
+    private static int textureUniformHandle;
 
     private static int MVPMatrixHandle; //handle to the model-view-projection matrix
     private static String vertexShaderCode;
@@ -34,6 +37,8 @@ public class GLManager {
         if(!loadShaders(context)) {
             Log.e("Failed load shaders", TAG);
         };
+        GLES20.glEnable(GLES20.GL_TEXTURE_2D);
+
         final int vertex = compileShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
         final int fragment = compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
         glProgramHandle = linkShaders(vertex, fragment);
@@ -44,7 +49,9 @@ public class GLManager {
         //so that we can manipulate these later
         positionAttributeHandle = GLES20.glGetAttribLocation(glProgramHandle, "position");
         colorUniformHandle = GLES20.glGetUniformLocation(glProgramHandle, "color");
+        textureCoordHandle = GLES20.glGetAttribLocation(glProgramHandle, "texCoordinate");
         MVPMatrixHandle = GLES20.glGetUniformLocation(glProgramHandle, "modelViewProjection");
+        textureUniformHandle = GLES20.glGetUniformLocation(glProgramHandle, "u_Texture");
         //activate the program
         GLES20.glUseProgram(glProgramHandle);
         GLES20.glLineWidth(5f); //draw lines 5px wide
@@ -102,21 +109,19 @@ public class GLManager {
         return handle;
     }
 
-    public static void draw(final Mesh model, final float[] modelViewMatrix, final float[] color){
+    public static void draw(final Mesh model, final float[] modelViewMatrix, final float[] color) {
         setShaderColor(color);
         uploadMesh(model._vertexBuffer);
         setModelViewProjection(modelViewMatrix);
         drawMesh(model._drawMode, model._vertexCount);
     }
 
-    private static void uploadMesh(final FloatBuffer vertexBuffer) {
+    public static void uploadMesh(final FloatBuffer vertexBuffer) {
         final boolean NORMALIZED = false;
         // enable a handle to the vertices
         GLES20.glEnableVertexAttribArray(GLManager.positionAttributeHandle);
         // prepare the vertex coordinate data
-        GLES20.glVertexAttribPointer(GLManager.positionAttributeHandle, Mesh.COORDS_PER_VERTEX,
-                GLES20.GL_FLOAT, NORMALIZED, Mesh.VERTEX_STRIDE,
-                vertexBuffer);
+        GLES20.glVertexAttribPointer(GLManager.positionAttributeHandle, Mesh.COORDS_PER_VERTEX, GLES20.GL_FLOAT, NORMALIZED, Mesh.VERTEX_STRIDE, vertexBuffer);
         checkGLError("uploadMesh");
     }
 
@@ -127,7 +132,7 @@ public class GLManager {
         checkGLError("setShaderColor");
     }
 
-    private static void drawMesh(final int drawMode, final int vertexCount) {
+    public static void drawMesh(final int drawMode, final int vertexCount) {
         assert(drawMode == GLES20.GL_TRIANGLES
                 || drawMode == GLES20.GL_LINES
                 || drawMode == GLES20.GL_POINTS);

@@ -53,22 +53,10 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
     private void Init() {
         _gameOver = false;
         _config = new Config(getContext());
-        _player = new Player(Config.WORLD_WIDTH/2f, Config.WORLD_HEIGHT/2f);
         _particlesToAdd = new ArrayList<Particle>();
         _particles = new ArrayList<Particle>();
         _waves = new Waves();
         _hud = new Hud();
-
-        Random r = new Random();
-        for(int i = 0; i < Config.STAR_COUNT; i++){
-            _stars.add(new Star(r.nextInt((int) Config.WORLD_WIDTH), r.nextInt((int)Config.WORLD_HEIGHT)));
-        }
-
-        _asteroids = _waves.start();
-
-        for(int i = 0; i < Config.BULLET_COUNT; i++){
-            _bullets[i] = new Bullet();
-        }
 
         _soundPlayer = new SoundPlayer(getContext());
         _musicPlayer = new MusicPlayer(getContext());
@@ -79,6 +67,7 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
         _camera = new Camera(Config.WORLD_WIDTH/2);
 
         GLEntity._game = this;
+        GLManager._game = this;
         setEGLContextClientVersion(2); //select OpenGL ES 2.0
         setPreserveEGLContextOnPause(true); //context *may* be preserved and thus *may* avoid slow reloads when switching apps.
         // we always re-create the OpenGL context in onSurfaceCreated, so we're safe either way.
@@ -117,6 +106,7 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
 
             _analytics.update(dt);
             _player.update(dt);
+            _inputs.update();
 
             collisionDetection();
             removeDeadEntities();
@@ -294,12 +284,24 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(final GL10 unused, final EGLConfig config) {
-
         // Set clear color
         GLES20.glClearColor(Colors.blue[0], Colors.blue[1], Colors.blue[2], Colors.blue[3]);
 
         // build shader program
         GLManager.buildProgram(getContext());
+
+        _player = new Player(Config.WORLD_WIDTH / 2f, Config.WORLD_HEIGHT / 2f);
+
+        Random r = new Random();
+        for(int i = 0; i < Config.STAR_COUNT; i++){
+            _stars.add(new Star(r.nextInt((int) Config.WORLD_WIDTH), r.nextInt((int)Config.WORLD_HEIGHT)));
+        }
+
+        _asteroids = _waves.start();
+
+        for(int i = 0; i < Config.BULLET_COUNT; i++){
+            _bullets[i] = new Bullet();
+        }
     }
 
     @Override

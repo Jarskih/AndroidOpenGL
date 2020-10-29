@@ -4,11 +4,32 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class TouchController extends InputManager implements View.OnTouchListener{
+    private boolean _wasButtonPressed = false;
+
     public TouchController(View view){
         view.findViewById(R.id.keypad_left).setOnTouchListener(this);
         view.findViewById(R.id.keypad_right).setOnTouchListener(this);
         view.findViewById(R.id.keypad_a).setOnTouchListener(this);
         view.findViewById(R.id.keypad_b).setOnTouchListener(this);
+    }
+
+    @Override
+    public void update() {
+        if(_pressingA && !_wasButtonPressed) {
+            _fireButtonJustPressed = true;
+        }
+
+        if(_pressingA && _wasButtonPressed) {
+            _fireButtonPressed = true;
+            _fireButtonJustPressed = false;
+        }
+
+        if(!_pressingA && _wasButtonPressed) {
+            _fireButtonPressed = false;
+            _fireButtonJustPressed = false;
+        }
+
+        _wasButtonPressed = _pressingA;
     }
 
     @Override
