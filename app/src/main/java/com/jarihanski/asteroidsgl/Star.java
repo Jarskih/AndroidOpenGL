@@ -20,5 +20,10 @@ public class Star extends GLEntity {
         }
         _mesh = m; //all Stars use the exact same Mesh instance.
         setColors(1.0f, 1.0f,1.0f, 1.0f);
+
+        _shader = new Shader(_game.getContext());
+        _shader.create(R.raw.vertex, R.raw.fragment);
+        _format = new VertexFormat();
+        _format.addAttribute(0, Mesh.COORDS_PER_VERTEX, GLES20.GL_FLOAT, NORMALIZED, Mesh.VERTEX_STRIDE, _mesh._vertexBuffer);
     }
 }

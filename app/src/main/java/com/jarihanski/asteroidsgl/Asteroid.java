@@ -13,7 +13,6 @@ public class Asteroid extends GLEntity {
     private int _points;
     private int _asteroidSize;
     private double _accumulator;
-    private double _breakDelay = 0.1f;
 
     public Asteroid(final float x, final float y, int size) {
         _x = x;
@@ -21,6 +20,11 @@ public class Asteroid extends GLEntity {
 
         _asteroidSize = size;
         create(size);
+
+        _shader = new Shader(_game.getContext());
+        _shader.create(R.raw.vertex, R.raw.fragment);
+        _format = new VertexFormat();
+        _format.addAttribute(0, Mesh.COORDS_PER_VERTEX, GLES20.GL_FLOAT, NORMALIZED, Mesh.VERTEX_STRIDE, _mesh._vertexBuffer);
     }
 
     private void create(int size) {
@@ -77,6 +81,7 @@ public class Asteroid extends GLEntity {
     }
 
     private boolean canBreak() {
+        double _breakDelay = 0.1f;
         return _accumulator > _breakDelay;
     }
 

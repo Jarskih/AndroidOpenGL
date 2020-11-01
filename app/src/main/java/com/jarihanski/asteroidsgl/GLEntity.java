@@ -24,6 +24,10 @@ public class GLEntity {
     public static final float[] viewportModelMatrix = new float[4*4];
     public static final float[] rotationViewportModelMatrix = new float[4*4];
 
+    Shader _shader = null;
+    VertexFormat _format = null;
+    final boolean NORMALIZED = false;
+
     public GLEntity(){}
 
     public void update(final double dt) {

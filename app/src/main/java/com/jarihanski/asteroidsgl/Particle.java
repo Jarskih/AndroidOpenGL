@@ -29,6 +29,11 @@ public class Particle extends GLEntity {
         final float[] verts = Mesh.generateLinePolygon(_points, radius);
         _mesh = new Mesh(verts, GLES20.GL_LINES);
         _mesh.setWidthHeight(_width, _height);
+
+        _shader = new Shader(_game.getContext());
+        _shader.create(R.raw.vertex, R.raw.fragment);
+        _format = new VertexFormat();
+        _format.addAttribute(0, Mesh.COORDS_PER_VERTEX, GLES20.GL_FLOAT, NORMALIZED, Mesh.VERTEX_STRIDE, _mesh._vertexBuffer);
     }
 
     @Override

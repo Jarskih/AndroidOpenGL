@@ -6,12 +6,7 @@ import android.opengl.Matrix;
 
 public class Player extends GLEntity {
     private static final String TAG = "Player";
-    public static final float TIME_BETWEEN_SHOTS = 0.5f;
     private float _bulletCooldown = 0;
-
-    private Shader _shader;
-    private VertexFormat _format;
-    final boolean NORMALIZED = false;
 
     public Player(float x, float y){
         super();
@@ -19,11 +14,7 @@ public class Player extends GLEntity {
         _y = y;
         _width = Config.PLAYER_WIDTH;
         _height = Config.PLAYER_HEIGHT;
-        float[] vertices = { // in counterclockwise order:
-                0.0f,  0.5f, 0.0f, 	// top
-                -0.5f, -0.5f, 0.0f,	// bottom left
-                0.5f, -0.5f, 0.0f  	// bottom right
-        };
+        float[] vertices = Triangle.vertices;
         setColors(_color);
         _mesh = new Mesh(vertices, GLES20.GL_TRIANGLES);
         _mesh.setWidthHeight(_width, _height);
@@ -54,7 +45,7 @@ public class Player extends GLEntity {
         if(_game._inputs._fireButtonJustPressed && _bulletCooldown <= 0){
             setColors(1, 0, 1, 1);
             if(_game.maybeFireBullet(this)){
-                _bulletCooldown = TIME_BETWEEN_SHOTS;
+                _bulletCooldown = Config.TIME_BETWEEN_SHOTS;
             }
         }else{
             setColors(Colors.yellow);

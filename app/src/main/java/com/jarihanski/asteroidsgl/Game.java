@@ -29,7 +29,7 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
     private ArrayList<Particle> _particlesToAdd;
     private ArrayList<Particle> _particles;
 
-    Bullet[] _bullets = new Bullet[Config.BULLET_COUNT];
+    Bullet[] _bullets = null;
     private boolean _gameOver;
 
     public enum GameEvent {
@@ -51,8 +51,11 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
     }
 
     private void Init() {
+
+
         _gameOver = false;
         _config = new Config(getContext());
+         _bullets = new Bullet[Config.BULLET_COUNT];
         _particlesToAdd = new ArrayList<Particle>();
         _particles = new ArrayList<Particle>();
         _waves = new Waves();
@@ -62,7 +65,6 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
         _musicPlayer = new MusicPlayer(getContext());
         _musicPlayer.playMusic();
 
-        _particleSystem = new ParticleSystem(Config.MAX_PARTICLES);
         _analytics = new Analytics();
         _camera = new Camera(Config.WORLD_WIDTH/2);
 
@@ -71,7 +73,6 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
         setEGLContextClientVersion(2); //select OpenGL ES 2.0
         setPreserveEGLContextOnPause(true); //context *may* be preserved and thus *may* avoid slow reloads when switching apps.
         // we always re-create the OpenGL context in onSurfaceCreated, so we're safe either way.
-
         setRenderer(this);
     }
 
@@ -290,6 +291,7 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
         // build shader program
         GLManager.buildProgram(getContext());
 
+        _particleSystem = new ParticleSystem(Config.MAX_PARTICLES);
         _player = new Player(Config.WORLD_WIDTH / 2f, Config.WORLD_HEIGHT / 2f);
 
         Random r = new Random();

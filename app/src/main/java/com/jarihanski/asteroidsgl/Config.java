@@ -21,11 +21,15 @@ public class Config {
     public static int PARTICLES_PER_EXPLOSION;
     public static int MAX_PARTICLES;
     public static int ASTEROID_INCREASE_PER_WAVE;
+    public static float TIME_BETWEEN_SHOTS;
+    public static float BULLET_SPEED;
+    public static float TIME_TO_LIVE;
+
     public static final long SECOND_IN_NANOSECONDS = 1000000000;
     public static final long MILLISECOND_IN_NANOSECONDS = 1000000;
     public static final float NANOSECONDS_TO_MILLISECONDS = 1.0f / MILLISECOND_IN_NANOSECONDS;
     public static final float NANOSECONDS_TO_SECONDS = 1.0f / SECOND_IN_NANOSECONDS;
-    public static final int BULLET_COUNT = (int)(Bullet.TIME_TO_LIVE/Player.TIME_BETWEEN_SHOTS)+1;
+    public static int BULLET_COUNT;
 
     //Asteroids
     public static float BIG_MIN_VEL;
@@ -60,6 +64,9 @@ public class Config {
         PARTICLES_PER_EXPLOSION = readConfigInt(context, "PARTICLES_PER_EXPLOSION");
         MAX_PARTICLES = readConfigInt(context, "MAX_PARTICLES");
         ASTEROID_INCREASE_PER_WAVE = readConfigInt(context, "ASTEROID_INCREASE_PER_WAVE");
+        TIME_BETWEEN_SHOTS = readConfigFloat(context, "TIME_BETWEEN_SHOTS");
+        BULLET_SPEED = readConfigFloat(context, "BULLET_SPEED");
+        TIME_TO_LIVE = readConfigFloat(context, "TIME_TO_LIVE");
 
         BIG_MIN_VEL = readConfigFloat(context, "BIG_MIN_VEL");
         BIG_MAX_VEL = readConfigFloat(context, "BIG_MAX_VEL");
@@ -75,6 +82,8 @@ public class Config {
         Points.SMALL = readConfigInt(context, "POINTS_SMALL");
 
         TEXT_SCALE = readConfigFloat(context, "TEXT_SCALE");
+
+        BULLET_COUNT = (int)(TIME_TO_LIVE/TIME_BETWEEN_SHOTS)+1;
     }
 
     // https://stackoverflow.com/questions/5140539/android-config-file
