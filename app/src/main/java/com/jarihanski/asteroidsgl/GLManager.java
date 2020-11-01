@@ -18,8 +18,6 @@ public class GLManager {
     private static int glProgramHandle; //handle to the compiled shader program
     private static int colorUniformHandle; //handle to the color setting
     private static int positionAttributeHandle; //handle to the vertex position setting
-    private static int textureCoordHandle; // handle to texture coordinates
-    private static int textureUniformHandle;
 
     private static int MVPMatrixHandle; //handle to the model-view-projection matrix
     private static String vertexShaderCode;
@@ -36,8 +34,7 @@ public class GLManager {
     public static void buildProgram(Context context){
         if(!loadShaders(context)) {
             Log.e("Failed load shaders", TAG);
-        };
-        GLES20.glEnable(GLES20.GL_TEXTURE_2D);
+        }
 
         final int vertex = compileShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
         final int fragment = compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
@@ -49,9 +46,7 @@ public class GLManager {
         //so that we can manipulate these later
         positionAttributeHandle = GLES20.glGetAttribLocation(glProgramHandle, "position");
         colorUniformHandle = GLES20.glGetUniformLocation(glProgramHandle, "color");
-        textureCoordHandle = GLES20.glGetAttribLocation(glProgramHandle, "texCoordinate");
         MVPMatrixHandle = GLES20.glGetUniformLocation(glProgramHandle, "modelViewProjection");
-        textureUniformHandle = GLES20.glGetUniformLocation(glProgramHandle, "u_Texture");
         //activate the program
         GLES20.glUseProgram(glProgramHandle);
         GLES20.glLineWidth(5f); //draw lines 5px wide

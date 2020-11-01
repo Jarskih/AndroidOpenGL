@@ -8,20 +8,25 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import static com.jarihanski.asteroidsgl.GLManager.checkGLError;
-
 public class Shader {
     private static String TAG = "Shader";
 
     private static String vertexShaderCode;
     private static String fragmentShaderCode;
-    private static Context _context;
+    private Context _context;
 
     //handles to various GL objects:
     public int glProgramHandle; //handle to the compiled shader program
 
     Shader(Context context) {
         _context = context;
+    }
+
+    public static void checkGLError(final String func){
+        int error;
+        while((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR){
+            Log.e(func, "glError " + error);
+        }
     }
 
     public boolean create(final int vertex_shader_id, final int fragment_shader_id)
@@ -97,7 +102,7 @@ public class Shader {
         GLES20.glDisableVertexAttribArray(id);
     }
 
-    private static boolean loadShaders(int vertex_id, int fragment_id) {
+    private boolean loadShaders(int vertex_id, int fragment_id) {
         try {
             char[] buffer = new char[256];
             BufferedReader reader = new BufferedReader(new InputStreamReader(_context.getResources().openRawResource(vertex_id)));
@@ -121,7 +126,7 @@ public class Shader {
         return true;
     }
 
-    private static int compileShader(final int type, final String shaderCode){
+    private int compileShader(final int type, final String shaderCode){
         assert(type == GLES20.GL_VERTEX_SHADER || type == GLES20.GL_FRAGMENT_SHADER);
         final int handle = GLES20.glCreateShader(type); // Create a shader object and store its handle
         GLES20.glShaderSource(handle, shaderCode); // Pass in the code
@@ -131,7 +136,7 @@ public class Shader {
         return handle;
     }
 
-    private static int linkShaders(final int vertexShader, final int fragmentShader){
+    private int linkShaders(final int vertexShader, final int fragmentShader){
         final int handle = GLES20.glCreateProgram();
         GLES20.glAttachShader(handle, vertexShader);
         GLES20.glAttachShader(handle, fragmentShader);

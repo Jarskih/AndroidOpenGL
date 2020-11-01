@@ -2,7 +2,6 @@ package com.jarihanski.asteroidsgl;
 
 import android.graphics.PointF;
 import android.opengl.GLES20;
-import android.opengl.Matrix;
 
 public class Player extends GLEntity {
     private static final String TAG = "Player";
@@ -61,33 +60,7 @@ public class Player extends GLEntity {
 
     @Override
     public void render(float[] viewportMatrix) {
-        final int OFFSET = 0;
-        //reset the model matrix and then translate (move) it into world space
-        Matrix.setIdentityM(modelMatrix, OFFSET); //reset model matrix
-        Matrix.translateM(modelMatrix, OFFSET, _x, _y, _depth);
-        //viewportMatrix * modelMatrix combines into the viewportModelMatrix
-        //NOTE: projection matrix on the left side and the model matrix on the right side.
-        Matrix.multiplyMM(viewportModelMatrix, OFFSET, viewportMatrix, OFFSET, modelMatrix, OFFSET);
-        //apply a rotation around the Z-axis to our modelMatrix. Rotation is in degrees.
-        Matrix.setRotateM(modelMatrix, OFFSET, _rotation, 0, 0, 1.0f);
-        //apply scaling to our modelMatrix, on the x and y axis only.
-        Matrix.scaleM(modelMatrix, OFFSET, _scale, _scale, 1f);
-        //finally, multiply the rotated & scaled model matrix into the model-viewport matrix
-        //creating the final rotationViewportModelMatrix that we pass on to OpenGL
-        Matrix.multiplyMM(rotationViewportModelMatrix, OFFSET, viewportModelMatrix, OFFSET, modelMatrix, OFFSET);
-
-        _shader.bind();
-        _shader.set_uniform_vec4("color", _color);
-        _shader.set_uniform_mat4("modelViewProjection", rotationViewportModelMatrix);
-        _format.bind();
-
-        assert(_mesh._drawMode == GLES20.GL_TRIANGLES
-                || _mesh._drawMode == GLES20.GL_LINES
-                || _mesh._drawMode == GLES20.GL_POINTS);
-        // draw the previously uploaded vertices
-        GLES20.glDrawArrays(_mesh._drawMode, OFFSET, _mesh._vertexCount);
-        // disable vertex array
-        _shader.clear("position");
+        super.render(viewportMatrix);
     }
 
     @Override

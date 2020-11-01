@@ -1,7 +1,6 @@
 package com.jarihanski.asteroidsgl;
 
 import android.content.Context;
-import android.opengl.Matrix;
 
 public class Hud {
     private Text _wave = null;

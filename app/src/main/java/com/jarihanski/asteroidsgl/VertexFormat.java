@@ -10,12 +10,12 @@ import static android.opengl.GLES20.glVertexAttribPointer;
 public class VertexFormat {
     private int ATTRIBUTE_COUNT = 4;
     private int _attribute_count;
-    private Attribute _attributes[];
+    private Attribute[] _attributes;
 
     private class Attribute
     {
         Attribute(){
-        };
+        }
 
         public int _index;
         public int _size;
@@ -23,7 +23,7 @@ public class VertexFormat {
         public boolean _normalized;
         public int _stride;
         FloatBuffer _vertexBuffer;
-    };
+    }
 
     VertexFormat() {
         _attributes = new Attribute[ATTRIBUTE_COUNT];
@@ -58,5 +58,5 @@ public class VertexFormat {
             glEnableVertexAttribArray(index);
             glVertexAttribPointer(attrib._index, attrib._size, attrib._type, attrib._normalized, attrib._stride, attrib._vertexBuffer);
         }
-    };
+    }
 }

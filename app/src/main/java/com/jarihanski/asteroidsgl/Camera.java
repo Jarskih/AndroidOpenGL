@@ -36,7 +36,7 @@ public class Camera {
         _top = 0;
         _near = 0f;
         _far = 1f;
-    };
+    }
 
     void lookAt(float x, float y, float[] viewportMatrix) {
         Matrix.orthoM(viewportMatrix, _offset, _left, _right, _bottom, _top, _near, _far);

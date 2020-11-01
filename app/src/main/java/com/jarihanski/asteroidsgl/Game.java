@@ -65,11 +65,10 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
         _musicPlayer = new MusicPlayer(getContext());
         _musicPlayer.playMusic();
 
-        _analytics = new Analytics();
+        _analytics = new Analytics(getContext());
         _camera = new Camera(Config.WORLD_WIDTH/2);
 
         GLEntity._game = this;
-        GLManager._game = this;
         setEGLContextClientVersion(2); //select OpenGL ES 2.0
         setPreserveEGLContextOnPause(true); //context *may* be preserved and thus *may* avoid slow reloads when switching apps.
         // we always re-create the OpenGL context in onSurfaceCreated, so we're safe either way.
@@ -105,9 +104,9 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
                 b.update(dt);
             }
 
-            _analytics.update(dt);
             _player.update(dt);
             _inputs.update();
+            _analytics.update(accumulator);
 
             collisionDetection();
             removeDeadEntities();
@@ -144,8 +143,7 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
             if(b.isDead()){ continue; } //skip
             b.render(_camera.viewportMatrix);
         }
-
-        _analytics.render(getContext(), _camera.viewportMatrix, _player);
+        _analytics.render(getContext(), _camera.viewportMatrix);
 
         _hud.render(_player, getContext(), _camera.viewportMatrix,_waves.getWave(),_asteroids.size());
     }

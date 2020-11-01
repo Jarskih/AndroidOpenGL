@@ -8,10 +8,13 @@ public class InputManager {
     public boolean _fireButtonJustPressed;
     public boolean _fireButtonPressed;
 
-    public void onStart() {};
-    public void onStop() {};
-    public void onPause() {};
-    public void onResume() {};
+    public void onStart() {}
+
+    public void onStop() {}
+
+    public void onPause() {}
+
+    public void onResume() {}
 
     public void update() {
     }

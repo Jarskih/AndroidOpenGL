@@ -1,6 +1,7 @@
 package com.jarihanski.asteroidsgl;
 
 import android.graphics.PointF;
+import android.opengl.GLES20;
 import android.opengl.Matrix;
 
 import java.util.Objects;
@@ -8,7 +9,7 @@ import java.util.Objects;
 public class GLEntity {
     public static Game _game = null; //shared ref, managed by the Game-class!
     Mesh _mesh = null;
-    float _color[] = { 1.0f, 1.0f, 1.0f, 1.0f }; //default white
+    float[] _color = { 1.0f, 1.0f, 1.0f, 1.0f }; //default white
     float _depth = 0f; //we'll use _depth for z-axis if we need to entities
     float _scale = 1f;
     float _rotation = 0f; //angle in degrees
@@ -63,7 +64,18 @@ public class GLEntity {
         //creating the final rotationViewportModelMatrix that we pass on to OpenGL
         Matrix.multiplyMM(rotationViewportModelMatrix, OFFSET, viewportModelMatrix, OFFSET, modelMatrix, OFFSET);
 
-        GLManager.draw(_mesh, rotationViewportModelMatrix, _color);
+        _shader.bind();
+        _shader.set_uniform_vec4("color", _color);
+        _shader.set_uniform_mat4("modelViewProjection", rotationViewportModelMatrix);
+        _format.bind();
+
+        assert(_mesh._drawMode == GLES20.GL_TRIANGLES
+                || _mesh._drawMode == GLES20.GL_LINES
+                || _mesh._drawMode == GLES20.GL_POINTS);
+        // draw the previously uploaded vertices
+        GLES20.glDrawArrays(_mesh._drawMode, OFFSET, _mesh._vertexCount);
+        // disable vertex array
+        _shader.clear("position");
     }
 
     public boolean isDead(){
