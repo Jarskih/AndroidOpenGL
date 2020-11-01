@@ -12,7 +12,7 @@ public class GLPixelFont {
     public static final int HEIGHT = 7; //characters are 7 units tall
     private static final int CHAR_COUNT = 46; //the font definition contains 46 entries
     private static final int OFFSET = 45; //it start at ASCII code 45 "-", and ends at 90 "Z".
-    private Mesh[] _glyphs = new Mesh[CHAR_COUNT]; //a vertex buffer for each glyph, for rendering with OpenGL.
+    private final Mesh[] _glyphs = new Mesh[CHAR_COUNT]; //a vertex buffer for each glyph, for rendering with OpenGL.
 
     public GLPixelFont() {
         for (int c = 0; c < CHAR_COUNT; c++) {

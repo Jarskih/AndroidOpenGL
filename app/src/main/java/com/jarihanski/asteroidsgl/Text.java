@@ -4,9 +4,9 @@ import android.opengl.Matrix;
 
 public class Text extends GLEntity {
     public static final GLPixelFont FONT = new GLPixelFont();
-    public static float GLYPH_WIDTH = GLPixelFont.WIDTH;
-    public static float GLYPH_HEIGHT = GLPixelFont.HEIGHT;
-    public static float GLYPH_SPACING = 1f;
+    public static final float GLYPH_WIDTH = GLPixelFont.WIDTH;
+    public static final float GLYPH_HEIGHT = GLPixelFont.HEIGHT;
+    public static final float GLYPH_SPACING = 1f;
 
     Mesh[] _meshes = null;
     private float _spacing = GLYPH_SPACING; //spacing between characters

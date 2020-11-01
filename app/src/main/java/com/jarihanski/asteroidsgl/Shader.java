@@ -9,11 +9,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Shader {
-    private static String TAG = "Shader";
+    private static final String TAG = "Shader";
 
     private static String vertexShaderCode;
     private static String fragmentShaderCode;
-    private Context _context;
+    private final Context _context;
 
     //handles to various GL objects:
     public int glProgramHandle; //handle to the compiled shader program
@@ -36,7 +36,10 @@ public class Shader {
             return false;
         }
 
-        loadShaders(vertex_shader_id, fragment_shader_id);
+        if(!loadShaders(vertex_shader_id, fragment_shader_id)) {
+            return false;
+        }
+
         final int vertex = compileShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
         final int fragment = compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
         glProgramHandle = linkShaders(vertex, fragment);
@@ -131,7 +134,6 @@ public class Shader {
         final int handle = GLES20.glCreateShader(type); // Create a shader object and store its handle
         GLES20.glShaderSource(handle, shaderCode); // Pass in the code
         GLES20.glCompileShader(handle); // then compile the shader
-        Log.d(TAG, "Shader Compile Log: \n" + GLES20.glGetShaderInfoLog(handle));
         checkGLError("compileShader");
         return handle;
     }
@@ -141,7 +143,6 @@ public class Shader {
         GLES20.glAttachShader(handle, vertexShader);
         GLES20.glAttachShader(handle, fragmentShader);
         GLES20.glLinkProgram(handle);
-        Log.d(TAG, "Shader Link Log: \n" + GLES20.glGetProgramInfoLog(handle));
         checkGLError("linkShaders");
         return handle;
     }

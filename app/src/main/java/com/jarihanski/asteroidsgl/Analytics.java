@@ -11,7 +11,7 @@ public class Analytics {
     private double _msPerFrame;
     private boolean _update;
     final int _offset = 15;
-    private double _speed = 10;
+    private final double _speed = 10;
 
     Analytics(Context context) {
         _update = true;

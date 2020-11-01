@@ -27,8 +27,8 @@ public class Mesh {
     public float _height = 0f;
     public float _depth = 0f;
     public float _radius = 0f;
-    public Point3D _min = new Point3D();
-    public Point3D _max = new Point3D();
+    public final Point3D _min = new Point3D();
+    public final Point3D _max = new Point3D();
 
     PointF[] _hull = null;
     private int _pointIndex = 0;

@@ -5,11 +5,11 @@ import android.opengl.Matrix;
 
 
 public class Camera {
-    public float[] viewportMatrix = new float[4*4]; //In essence, it is our our Camera
+    public final float[] viewportMatrix = new float[4*4]; //In essence, it is our our Camera
     static float METERS_TO_SHOW_X;
     static float METERS_TO_SHOW_Y;
-    private float _x;
-    private float _y;
+    private final float _x;
+    private final float _y;
     private int _offset = 0;
     private float _left = 0;
     private float _right = 0;

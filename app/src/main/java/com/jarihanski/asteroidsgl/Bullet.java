@@ -2,11 +2,13 @@ package com.jarihanski.asteroidsgl;
 
 import android.graphics.PointF;
 import android.opengl.GLES20;
+import android.util.Log;
 
 import static com.jarihanski.asteroidsgl.Mesh.generateLinePolygon;
 
 public class Bullet extends GLEntity {
-    private static Mesh BULLET_MESH = new Mesh(generateLinePolygon(3, 0), GLES20.GL_POINTS); //Q&D pool, Mesh.POINT is just [0,0,0] float array
+    private final static String TAG = "Bullet";
+    private static final Mesh BULLET_MESH = new Mesh(generateLinePolygon(3, 0), GLES20.GL_POINTS); //Q&D pool, Mesh.POINT is just [0,0,0] float array
     private static final float TO_RADIANS = (float) Math.PI / 180.0f;
 
     public float _ttl = Config.TIME_TO_LIVE;
@@ -16,7 +18,9 @@ public class Bullet extends GLEntity {
         _mesh = BULLET_MESH; //all bullets use the exact same mesh
 
         _shader = new Shader(_game.getContext());
-        _shader.create(R.raw.vertex, R.raw.fragment);
+        if(!_shader.create(R.raw.vertex, R.raw.fragment)) {
+            Log.e(TAG, "Failed to create shader");
+        }
         _format = new VertexFormat();
         _format.addAttribute(0, Mesh.COORDS_PER_VERTEX, GLES20.GL_FLOAT, NORMALIZED, Mesh.VERTEX_STRIDE, _mesh._vertexBuffer);
     }

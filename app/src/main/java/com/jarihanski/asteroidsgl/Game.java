@@ -23,7 +23,7 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
     private Waves _waves = null;
     private Hud _hud = null;
 
-    private ArrayList<Star> _stars= new ArrayList();
+    private final ArrayList<Star> _stars= new ArrayList();
 
     private ArrayList<Asteroid> _asteroids = new ArrayList();
     private ArrayList<Particle> _particlesToAdd;
@@ -34,8 +34,7 @@ public class Game extends GLSurfaceView implements GLSurfaceView.Renderer {
 
     public enum GameEvent {
         Explosion,
-        Shoot,
-        PlayerDied
+        Shoot
     }
 
     public InputManager _inputs = new InputManager(); //empty but valid default

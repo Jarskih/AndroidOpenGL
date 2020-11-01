@@ -1,8 +1,10 @@
 package com.jarihanski.asteroidsgl;
 
 import android.opengl.GLES20;
+import android.util.Log;
 
 public class Asteroid extends GLEntity {
+    private final static String TAG = "Asteroid";
 
     public static class AsteroidType {
         final static int BIG = 2;
@@ -57,7 +59,9 @@ public class Asteroid extends GLEntity {
         _mesh.setWidthHeight(_width, _height);
 
         _shader = new Shader(_game.getContext());
-        _shader.create(R.raw.vertex, R.raw.fragment);
+        if(!_shader.create(R.raw.vertex, R.raw.fragment)) {
+            Log.e(TAG, "Failed to create shader");
+        }
         _format = new VertexFormat();
         _format.addAttribute(0, Mesh.COORDS_PER_VERTEX, GLES20.GL_FLOAT, NORMALIZED, Mesh.VERTEX_STRIDE, _mesh._vertexBuffer);
     }

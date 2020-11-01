@@ -9,8 +9,8 @@ import java.util.Objects;
 public class GLEntity {
     public static Game _game = null; //shared ref, managed by the Game-class!
     Mesh _mesh = null;
-    float[] _color = { 1.0f, 1.0f, 1.0f, 1.0f }; //default white
-    float _depth = 0f; //we'll use _depth for z-axis if we need to entities
+    final float[] _color = { 1.0f, 1.0f, 1.0f, 1.0f }; //default white
+    final float _depth = 0f; //we'll use _depth for z-axis if we need to entities
     float _scale = 1f;
     float _rotation = 0f; //angle in degrees
     public float _x = 0.0f;

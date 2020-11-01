@@ -8,9 +8,9 @@ import static android.opengl.GLES20.glEnableVertexAttribArray;
 import static android.opengl.GLES20.glVertexAttribPointer;
 
 public class VertexFormat {
-    private int ATTRIBUTE_COUNT = 4;
+    private final int ATTRIBUTE_COUNT = 4;
     private int _attribute_count;
-    private Attribute[] _attributes;
+    private final Attribute[] _attributes;
 
     private class Attribute
     {

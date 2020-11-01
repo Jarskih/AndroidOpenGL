@@ -6,8 +6,8 @@ import java.util.Random;
 public class Waves {
     private int _currentWave;
     private int _asteroids;
-    ArrayList<Asteroid> _wave;
-    Random _r;
+    final ArrayList<Asteroid> _wave;
+    final Random _r;
 
     Waves() {
         _r = new Random();

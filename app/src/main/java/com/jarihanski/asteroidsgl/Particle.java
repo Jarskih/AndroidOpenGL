@@ -1,18 +1,19 @@
 package com.jarihanski.asteroidsgl;
 
 import android.opengl.GLES20;
+import android.util.Log;
 
 public class Particle extends GLEntity {
+    private final static String TAG = "Particle";
     private static final float MIN_VEL = 8f;
     private static final float MAX_VEL = -8f;
     private static final float SIZE = 2;
     private static final float PARTICLE_SIZE = 2;
     private static final int PARTICLE_POINTS = 3;
 
-
-    private int _points;
+    private final int _points;
     private double _accumulator;
-    private double _lifetime = 1f;
+    private final double _lifetime = 1f;
 
     public Particle(final float x, final float y) {
         _x = x;
@@ -31,7 +32,9 @@ public class Particle extends GLEntity {
         _mesh.setWidthHeight(_width, _height);
 
         _shader = new Shader(_game.getContext());
-        _shader.create(R.raw.vertex, R.raw.fragment);
+        if(!_shader.create(R.raw.vertex, R.raw.fragment)) {
+            Log.e(TAG, "Failed to create shader");
+        }
         _format = new VertexFormat();
         _format.addAttribute(0, Mesh.COORDS_PER_VERTEX, GLES20.GL_FLOAT, NORMALIZED, Mesh.VERTEX_STRIDE, _mesh._vertexBuffer);
     }
