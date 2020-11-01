@@ -4,9 +4,6 @@ import android.graphics.PointF;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-
 public class Player extends GLEntity {
     private static final String TAG = "Player";
     public static final float TIME_BETWEEN_SHOTS = 0.5f;
@@ -14,7 +11,6 @@ public class Player extends GLEntity {
 
     private Shader _shader;
     private VertexFormat _format;
-    private Texture _texture;
     final boolean NORMALIZED = false;
 
     public Player(float x, float y){
@@ -34,9 +30,7 @@ public class Player extends GLEntity {
         _mesh.flipY();
 
         _shader = new Shader(_game.getContext());
-        _shader.create(R.raw.vertex_textured, R.raw.fragment_textured);
-        _texture = new Texture();
-        _texture.create(_game.getContext(), R.drawable.rock);
+        _shader.create(R.raw.vertex, R.raw.fragment);
         _format = new VertexFormat();
         _format.addAttribute(0, Mesh.COORDS_PER_VERTEX, GLES20.GL_FLOAT, NORMALIZED, Mesh.VERTEX_STRIDE, _mesh._vertexBuffer);
     }
@@ -95,20 +89,14 @@ public class Player extends GLEntity {
         _shader.set_uniform_vec4("color", _color);
         _shader.set_uniform_mat4("modelViewProjection", rotationViewportModelMatrix);
         _format.bind();
-        _texture.bind();
 
-        // Tell the texture uniform sampler to use this texture in the shader by binding to texture unit 0.
-        final int textureUniformHandle = GLES20.glGetUniformLocation(_shader.glProgramHandle, "texture");
-        GLES20.glUniform1i(textureUniformHandle, 0);
-
-        // Pass in the texture coordinate information
-        int textureCoordinateHandle = GLES20.glGetAttribLocation(_shader.glProgramHandle, "texCoordinate");
-        final int mTextureCoordinateDataSize = 2;
-        GLES20.glVertexAttribPointer(textureCoordinateHandle, mTextureCoordinateDataSize, GLES20.GL_FLOAT, false, 0, _mesh._vertexBuffer);
-        GLES20.glEnableVertexAttribArray(textureCoordinateHandle);
-
-        // GLManager.draw(_mesh, rotationViewportModelMatrix, _color);
-        GLManager.drawMesh(_mesh._drawMode, _mesh._vertexCount);
+        assert(_mesh._drawMode == GLES20.GL_TRIANGLES
+                || _mesh._drawMode == GLES20.GL_LINES
+                || _mesh._drawMode == GLES20.GL_POINTS);
+        // draw the previously uploaded vertices
+        GLES20.glDrawArrays(_mesh._drawMode, OFFSET, _mesh._vertexCount);
+        // disable vertex array
+        _shader.clear("position");
     }
 
     @Override

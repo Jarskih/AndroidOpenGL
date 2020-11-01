@@ -91,6 +91,9 @@ public class Shader {
 
     public void clear(String name) {
         final int id = get_attrib_location(name);
+        if(id == -1) {
+            Log.e(TAG, "Error trying to get attribute location: " + name);
+        }
         GLES20.glDisableVertexAttribArray(id);
     }
 
